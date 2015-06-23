@@ -6,7 +6,7 @@ _THREAD_NUM=0
 _THREAD_PIPE_NAME=""
 _THREAD_PIPE_ID=100
 
-trap _clean_up SIGINT SIGTERM SIGKILL
+trap _clean_up SIGINT SIGHUP SIGTERM SIGKILL
 
 function thread_init()
 {
@@ -42,9 +42,15 @@ function thread_wait()
 	_delete_pipe
 }
 
-function _clean_up()
+
+function _clean_up
 {
 	rm -rf _thread_*
+
+	#send SIGTERM to all process in group
+	kill 0
+	#kill self, trap register SIGTERM,
+	#if not kill self, Infinite recursion
 	kill -9 $$
 }
 
